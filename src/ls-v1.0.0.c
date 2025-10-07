@@ -13,6 +13,7 @@ char **read_dir_names(const char *dirpath, int *out_n, int *out_maxlen);
 void free_names(char **names, int n);
 int get_terminal_width(void);
 void print_columns(char **names, int n, int maxlen);
+int cmp_names(const void *a, const void *b);
 
 /* -----------------------------
    Read All Visible Filenames
@@ -77,6 +78,15 @@ int get_terminal_width(void) {
 }
 
 /* -----------------------------
+   Sort Filenames Alphabetically
+----------------------------- */
+int cmp_names(const void *a, const void *b) {
+    const char *na = *(const char **)a;
+    const char *nb = *(const char **)b;
+    return strcmp(na, nb);  // ascending order
+}
+
+/* -----------------------------
    Print in Columns (Down–Across)
 ----------------------------- */
 void print_columns(char **names, int n, int maxlen) {
@@ -97,9 +107,9 @@ void print_columns(char **names, int n, int maxlen) {
             if (idx >= n) continue;
 
             if (c == cols - 1)
-                printf("%s", names[idx]);          // last column
+                printf("%s", names[idx]);
             else
-                printf("%-*s", colw, names[idx]);  // align columns
+                printf("%-*s", colw, names[idx]);
         }
         putchar('\n');
     }
@@ -108,15 +118,6 @@ void print_columns(char **names, int n, int maxlen) {
 /* -----------------------------
    Main Function
 ----------------------------- */
-/* -----------------------------
-   Sort Filenames Alphabetically
------------------------------ */
-int cmp_names(const void *a, const void *b) {
-    const char *na = *(const char **)a;
-    const char *nb = *(const char **)b;
-    return strcmp(na, nb);  // ascending order
-}
-
 int main(void) {
     int n, maxlen;
     char **names = read_dir_names(".", &n, &maxlen);
@@ -126,12 +127,13 @@ int main(void) {
         return 1;
     }
 
-    printf("Terminal width: %d\n", get_terminal_width());
-    printf("Files: %d, Longest name: %d\n\n", n, maxlen);
+    /* Task 2: sort filenames alphabetically */
     qsort(names, n, sizeof(char *), cmp_names);
-	
+
+    /* Task 3: apply to all display modes (only one here) */
     print_columns(names, n, maxlen);
 
+    /* cleanup */
     free_names(names, n);
     return 0;
 }
