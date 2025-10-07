@@ -108,6 +108,15 @@ void print_columns(char **names, int n, int maxlen) {
 /* -----------------------------
    Main Function
 ----------------------------- */
+/* -----------------------------
+   Sort Filenames Alphabetically
+----------------------------- */
+int cmp_names(const void *a, const void *b) {
+    const char *na = *(const char **)a;
+    const char *nb = *(const char **)b;
+    return strcmp(na, nb);  // ascending order
+}
+
 int main(void) {
     int n, maxlen;
     char **names = read_dir_names(".", &n, &maxlen);
@@ -119,7 +128,8 @@ int main(void) {
 
     printf("Terminal width: %d\n", get_terminal_width());
     printf("Files: %d, Longest name: %d\n\n", n, maxlen);
-
+    qsort(names, n, sizeof(char *), cmp_names);
+	
     print_columns(names, n, maxlen);
 
     free_names(names, n);
